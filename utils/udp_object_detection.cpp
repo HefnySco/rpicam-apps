@@ -4,7 +4,7 @@
  *
  * udp_object_detection.cpp - This utility file implements a UDP receiver
  * designed to process object detection information. It's specifically
- * tailored to receive data sent by `object_detect_draw_cv_stage.cpp`,
+ * tailored to receive data sent by `object_detect_udp_stage.cpp`,
  * but can also be used with generic UDP senders like `nc -ulp 12347`
  * for debugging raw data.
  *
@@ -29,8 +29,8 @@
 // A struct to hold the parsed detection data received over UDP.
 // This structure defines the format of the object detection information.
 struct ParsedDetection {
-    double x, y;          // Top-left corner coordinates of the detected object's bounding box
-    double width, height; // Dimensions of the detected object's bounding box
+    int x, y;          // Top-left corner coordinates of the detected object's bounding box
+    int width, height; // Dimensions of the detected object's bounding box
     std::string name;  // The name or label of the detected object (e.g., "person", "car")
     float confidence;  // The confidence score of the detection (0.0 to 1.0)
 };
@@ -111,7 +111,7 @@ private:
         // This helps in discarding malformed or unrelated UDP traffic.
         const uint32_t START_DELIMITER = 0xDDCCBBAA;
         // Define the minimum expected size of a valid packet, excluding the name string length.
-        const size_t MIN_PACKET_SIZE = sizeof(START_DELIMITER) + sizeof(int32_t) * 4 + sizeof(double) + sizeof(float);
+        const size_t MIN_PACKET_SIZE = sizeof(START_DELIMITER) + sizeof(int32_t) * 4 + sizeof(uint8_t) + sizeof(float);
 
         // Check if the received packet is too small to contain basic detection data.
         if (size < MIN_PACKET_SIZE) {
@@ -130,14 +130,14 @@ private:
 
         // Read x, y, width, and height (each as a 32-bit integer).
         // Data is directly cast and read from the buffer at the current offset.
-        detection_data.x = *(double*)(buffer + offset);
-        offset += sizeof(double);
-        detection_data.y = *(double*)(buffer + offset);
-        offset += sizeof(double);
-        detection_data.width = *(double*)(buffer + offset);
-        offset += sizeof(double);
-        detection_data.height = *(double*)(buffer + offset);
-        offset += sizeof(double);
+        detection_data.x = *(int32_t*)(buffer + offset);
+        offset += sizeof(int32_t);
+        detection_data.y = *(int32_t*)(buffer + offset);
+        offset += sizeof(int32_t);
+        detection_data.width = *(int32_t*)(buffer + offset);
+        offset += sizeof(int32_t);
+        detection_data.height = *(int32_t*)(buffer + offset);
+        offset += sizeof(int32_t);
 
         // Read the length of the object's name (as an 8-bit unsigned integer).
         uint8_t name_length = *(uint8_t*)(buffer + offset);

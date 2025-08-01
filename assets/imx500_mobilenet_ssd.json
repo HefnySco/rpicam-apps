@@ -118,9 +118,13 @@
 
     "object_detect_draw_cv":
     {
-        "line_thickness" : 2,
-        "enable_ip": false,
+        "line_thickness" : 2
+    },
+
+    "object_detect_udp":
+    {
         "ip" : "127.0.0.1",
         "port":12347
     }
+
 }
