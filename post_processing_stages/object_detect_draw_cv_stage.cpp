@@ -133,7 +133,9 @@ bool ObjectDetectDrawCvStage::Process(CompletedRequestPtr &completed_request)
 	completed_request->post_process_metadata.Get("object_detect.results", detections);
 
 	Mat image(info.height, info.width, CV_8U, ptr, info.stride);
-	
+	const unsigned int video_width = info.width;
+	const unsigned int video_height = info.height;
+
 	int font = FONT_HERSHEY_SIMPLEX;
 
 	for (auto &detection : detections)
@@ -170,11 +172,12 @@ bool ObjectDetectDrawCvStage::Process(CompletedRequestPtr &completed_request)
             udp_data_buffer.insert(udp_data_buffer.end(), (char*)&START_DELIMITER, (char*)&START_DELIMITER + sizeof(START_DELIMITER));
 
             // 2. Add x, y, width, height (4 bytes each)
-            const int32_t x = detection.box.x;
-            const int32_t y = detection.box.y;
-            const int32_t width = detection.box.width;
-            const int32_t height = detection.box.height;
-            udp_data_buffer.insert(udp_data_buffer.end(), (char*)&x, (char*)&x + sizeof(x));
+            const double x = (double)detection.box.x / (double)video_width;
+			const double y = (double)detection.box.y / (double)video_height;
+			const double width = (double)detection.box.width / (double)video_width;
+			const double height = (double)detection.box.height / (double)video_height;
+
+			udp_data_buffer.insert(udp_data_buffer.end(), (char*)&x, (char*)&x + sizeof(x));
             udp_data_buffer.insert(udp_data_buffer.end(), (char*)&y, (char*)&y + sizeof(y));
             udp_data_buffer.insert(udp_data_buffer.end(), (char*)&width, (char*)&width + sizeof(width));
             udp_data_buffer.insert(udp_data_buffer.end(), (char*)&height, (char*)&height + sizeof(height));
