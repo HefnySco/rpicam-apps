@@ -133,16 +133,27 @@ bool ObjectDetectDrawCvStage::Process(CompletedRequestPtr &completed_request)
 	completed_request->post_process_metadata.Get("object_detect.results", detections);
 
 	Mat image(info.height, info.width, CV_8U, ptr, info.stride);
-	Scalar colour = Scalar(255, 255, 255);
+	
 	int font = FONT_HERSHEY_SIMPLEX;
 
 	for (auto &detection : detections)
 	{
 		// Draw rectangle and text on the image
+		const float confidence = detection.confidence;
+		
+		Scalar colour;
+		if (confidence > 0.85) {
+			colour = Scalar(255, 255, 255); // Green (B, G, R)
+		} else if (confidence > 0.75) {
+			colour = Scalar(127, 127, 127); // Yellow (B, G, R)
+		} else {
+			colour = Scalar(64, 64, 64); // Red (B, G, R)
+		}
+
 		Rect r(detection.box.x, detection.box.y, detection.box.width, detection.box.height);
 		rectangle(image, r, colour, line_thickness_);
 		std::stringstream text_stream;
-		text_stream << detection.name << " " << (int)(detection.confidence * 100) << "%";
+		text_stream << detection.name << " " << (int)(confidence * 100) << "%";
 		std::string text = text_stream.str();
 		int baseline = 0;
 		Size size = getTextSize(text, font, font_size_, 2, &baseline);
