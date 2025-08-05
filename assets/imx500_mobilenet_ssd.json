@@ -121,7 +121,7 @@
         "line_thickness" : 2
     },
 
-    "object_detect_udp":
+    "object_detect_de_udp":
     {
         "ip" : "127.0.0.1",
         "port":12347

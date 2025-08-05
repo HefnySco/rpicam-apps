@@ -49,6 +49,7 @@ if opencv_dep.found()
         'plot_pose_cv_stage.cpp',
         'object_detect_draw_cv_stage.cpp',
         'object_detect_udp_stage.cpp',
+        'object_detect_de_udp_stage.cpp',
     ])
 
     # OpenCV assets
