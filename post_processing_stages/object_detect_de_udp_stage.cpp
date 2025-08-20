@@ -166,6 +166,9 @@ bool ObjectDetect_DE_UDPStage::Process(CompletedRequestPtr &completed_request)
         udp_data_buffer.push_back(name_length);
         udp_data_buffer.insert(udp_data_buffer.end(), detection.name.begin(), detection.name.begin() + name_length);
 
+        const uint32_t category = detection.category;
+        udp_data_buffer.insert(udp_data_buffer.end(), (char*)&category, (char*)&category + sizeof(category));
+
         // 4. Add confidence (4 bytes)
         const float confidence = detection.confidence;
         udp_data_buffer.insert(udp_data_buffer.end(), (char*)&confidence, (char*)&confidence + sizeof(confidence));

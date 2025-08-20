@@ -32,6 +32,7 @@ struct ParsedDetection {
     double x, y;          // Top-left corner coordinates of the detected object's bounding box
     double width, height; // Dimensions of the detected object's bounding box
     std::string name;  // The name or label of the detected object (e.g., "person", "car")
+    uint32_t category;
     float confidence;  // The confidence score of the detection (0.0 to 1.0)
 };
 
@@ -153,6 +154,9 @@ private:
         // which copies `name_length` characters starting from `buffer + offset`.
         detection_data.name.assign(buffer + offset, name_length);
         offset += name_length;
+        
+        detection_data.category = *(uint32_t*)(buffer + offset);
+        offset += sizeof(uint32_t);
 
         // Read the confidence score (as a 32-bit float).
         detection_data.confidence = *(float*)(buffer + offset);
@@ -184,6 +188,7 @@ int main() {
             std::cout << "Received Detection:" << std::endl;
             std::cout << "  Box: (" << detection.x << ", " << detection.y << ", " << detection.width << ", " << detection.height << ")" << std::endl;
             std::cout << "  Name: " << detection.name << std::endl;
+            std::cout << "  Category: " << detection.category << std::endl;
             std::cout << "  Confidence: " << detection.confidence << std::endl;
         }
         // In a real-world application, you might add a small delay here
